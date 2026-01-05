@@ -1,0 +1,25 @@
+plugins {
+    id 'java-library'
+}
+
+group = 'com.unifiedapiclient'
+version = '0.1.0'
+
+def javaVersion = JavaVersion.VERSION_21
+
+java {
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+}
+
+test {
+    useJUnitPlatform()
+}
