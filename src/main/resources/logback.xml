@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- Console appender with colored output for better readability -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <!-- Pattern: timestamp [thread] level logger - message
+                 Logger name shortened to 30 chars for readability
+                 Includes exception stack traces when present -->
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %highlight(%-5level) %logger{30} - %msg%n%ex</pattern>
+        </encoder>
+    </appender>
+
+    <!-- UnifiedApiClient logger: INFO level shows warnings and errors only
+         (operational logs are at DEBUG level) -->
+    <logger name="com.unifiedapiclient" level="TRACE"/>
+
+    <!-- Root logger: INFO level by default -->
+    <root level="TRACE">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>
