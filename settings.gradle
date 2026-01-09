@@ -1,3 +1,1 @@
-def projectName = providers.gradleProperty('projectName').get()
-
-rootProject.name = projectName
+rootProject.name = 'unifiedapiclient'
