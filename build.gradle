@@ -2,10 +2,17 @@ plugins {
     id 'java-library'
 }
 
-group = 'com.unifiedapiclient'
-version = '0.1.0'
+def projectVersion = providers.gradleProperty('projectVersion').get()
+def groupName = providers.gradleProperty('groupName').get()
+def javaVersion = JavaVersion.toVersion(providers.gradleProperty('javaVersion').get())
+def restAssuredVersion = providers.gradleProperty('restAssuredVersion').get()
+def slf4jVersion = providers.gradleProperty('slf4jVersion').get()
+def logbackVersion = providers.gradleProperty('logbackVersion').get()
+def jacksonVersion = providers.gradleProperty('jacksonVersion').get()
+def junitVersion = providers.gradleProperty('junitVersion').get()
 
-def javaVersion = JavaVersion.VERSION_21
+group = groupName
+version = projectVersion
 
 java {
     sourceCompatibility = javaVersion
@@ -16,10 +23,46 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+sourceSets {
+    integrationTest {
+        java {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+            srcDir file('src/integrationTest/java')
+        }
+        resources.srcDir file('src/integrationTest/resources')
+    }
 }
 
-test {
+configurations {
+    integrationTestImplementation.extendsFrom testImplementation
+    integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+}
+
+dependencies {
+    api "io.rest-assured:rest-assured:${restAssuredVersion}"
+    implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonVersion}"
+    implementation "org.slf4j:slf4j-api:${slf4jVersion}"
+    runtimeOnly "ch.qos.logback:logback-classic:${logbackVersion}"
+    testImplementation "org.junit.jupiter:junit-jupiter:${junitVersion}"
+}
+
+tasks.named('test') {
     useJUnitPlatform()
+    description = 'Runs unit tests (no network calls)'
+}
+
+task integrationTest(type: Test) {
+    description = 'Runs integration tests (requires network connectivity)'
+    group = 'verification'
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    useJUnitPlatform()
+    shouldRunAfter test
+}
+
+tasks.named('check') {
+    // Integration tests are not run by default in 'check' task
+    // Run them explicitly with: ./gradlew integrationTest
 }
